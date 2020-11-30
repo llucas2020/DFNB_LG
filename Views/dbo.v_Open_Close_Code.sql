@@ -1,14 +1,14 @@
 /*****************************************************************************************************************
-NAME:    dbo.tlb_Area_Dim
-PURPOSE: Create Table [dbo].[tlb_Area_Dim] 
+NAME:    dbo.v_Open_Close_Code
+PURPOSE: Create View [dbo].[v_Open_Close_Code]
 MODIFICATION LOG:
 Ver      Date        Author        Description
 -----   ----------   -----------   -------------------------------------------------------------------------------
-1.0     11/30/2020   LLUCAS2020      1. Created Table [dbo].[tlb_Area_Dim] 
+1.0     11/30/2020   LLUCAS2020      1. Created View [dbo].[v_Open_Close_Code]
 
 RUNTIME: 
 Approx. 1 min
-NOTES: This is one of the tables I created which will be used to provide analysys for Businesses.
+NOTES: This view was creates in order to help us see which branches had the most closures of accounts.
 
 These are the varioius Extract, Transform, and Load steps needed for the Example Data
 LICENSE: This code is covered by the GNU General Public License which guarantees end users
@@ -21,26 +21,23 @@ distributed under the same license terms.
 USE [DFNB2]
 GO
 
-/****** Object:  Table [dbo].[tlb_Area_Dim]    Script Date: 11/30/2020 3:51:33 PM ******/
-IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[tlb_Area_Dim]') AND type in (N'U'))
-DROP TABLE [dbo].[tlb_Area_Dim]
+/****** Object:  View [dbo].[v_Open_Close_Code]    Script Date: 11/30/2020 4:04:16 PM ******/
+DROP VIEW [dbo].[v_Open_Close_Code]
 GO
 
-/****** Object:  Table [dbo].[tlb_Area_Dim]    Script Date: 11/30/2020 3:51:33 PM ******/
+/****** Object:  View [dbo].[v_Open_Close_Code]    Script Date: 11/30/2020 4:04:16 PM ******/
 SET ANSI_NULLS ON
 GO
 
 SET QUOTED_IDENTIFIER ON
 GO
 
-CREATE TABLE [dbo].[tlb_Area_Dim](
-	[acct_area_id] [int] NOT NULL,
-	[acc_area_name] [varchar](50) NULL,
- CONSTRAINT [PK_tlb_Area_Dim] PRIMARY KEY CLUSTERED 
-(
-	[acct_area_id] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+CREATE VIEW  [dbo].[v_Open_Close_Code] AS
+SELECT count(branch_id) as 'Accounts'
+, branch_id
+, open_close_code
+from dbo.tlb_Account_Dim
+Group By open_close_code, branch_id
 GO
 
 

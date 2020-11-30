@@ -1,5 +1,5 @@
 /*****************************************************************************************************************
-NAME:    SQLServerCodeHeader.sql
+NAME:    dbo.tlb_Account_Fact_Dim
 PURPOSE: Create Table [dbo].[tlb_Account_Fact_Dim]
 MODIFICATION LOG:
 Ver      Date        Author        Description

@@ -1,5 +1,5 @@
 /*****************************************************************************************************************
-NAME:    SQLServerCodeHeader.sql
+NAME:    dbo.tlb_Customer_Account_Dim
 PURPOSE: Create Table [dbo].[tlb_Customer_Account_Dim]
 MODIFICATION LOG:
 Ver      Date        Author        Description

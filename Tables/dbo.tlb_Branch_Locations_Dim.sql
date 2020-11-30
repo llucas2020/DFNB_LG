@@ -1,5 +1,5 @@
 /*****************************************************************************************************************
-NAME:    SQLServerCodeHeader.sql
+NAME:    dbo.tlb_Branch_Locations_Dim
 PURPOSE: Create Table [dbo].[tlb_Branch_Locations_Dim]
 MODIFICATION LOG:
 Ver      Date        Author        Description
