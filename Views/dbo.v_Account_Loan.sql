@@ -33,8 +33,11 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 CREATE VIEW [dbo].[v_Account_Loan] AS
-SELECT SUM(loan_amt) as 'Total Loan Amount'
+SELECT YEAR(open_date) as 'Open Date Year'
+, SUM(loan_amt) as 'Total Loan Amount'
 FROM [dbo].[tlb_Account_Dim]
+WHERE YEAR(open_date) >= 2016 and YEAR(open_date) <= 2019
+GROUP BY YEAR(open_date)
 GO
 
 
