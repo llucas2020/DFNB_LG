@@ -8,7 +8,7 @@ Ver      Date        Author        Description
 
 RUNTIME: 
 Approx. 1 min
-NOTES: This shows all tables on the Database
+NOTES: This shows all tables and Views on the Database
 
 These are the varioius Extract, Transform, and Load steps needed for the Example Data
 LICENSE: This code is covered by the GNU General Public License which guarantees end users
@@ -20,12 +20,12 @@ distributed under the same license terms.
 
 USE [DFNB2]
 GO
-/****** Object:  Table [dbo].[tlb_Account_Dim]    Script Date: 11/30/2020 3:36:23 PM ******/
+/****** Object:  Table [dbo].[tblAccountDim]    Script Date: 12/9/2020 6:30:28 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE TABLE [dbo].[tlb_Account_Dim](
+CREATE TABLE [dbo].[tblAccountDim](
 	[acct_id] [int] NOT NULL,
 	[cust_id] [smallint] NOT NULL,
 	[branch_id] [smallint] NOT NULL,
@@ -34,96 +34,100 @@ CREATE TABLE [dbo].[tlb_Account_Dim](
 	[close_date] [date] NOT NULL,
 	[open_close_code] [varchar](1) NOT NULL,
 	[loan_amt] [decimal](20, 4) NOT NULL,
- CONSTRAINT [PK_tlb_Account_Dim] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_tblAccountDim] PRIMARY KEY CLUSTERED 
 (
 	[acct_id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[tlb_Account_Fact_Dim]    Script Date: 11/30/2020 3:36:23 PM ******/
+/****** Object:  View [dbo].[v_AccountLoan]    Script Date: 12/9/2020 6:30:28 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE TABLE [dbo].[tlb_Account_Fact_Dim](
+CREATE VIEW [dbo].[v_AccountLoan] AS
+SELECT YEAR(open_date) as 'Open Date Year'
+, SUM(loan_amt) as 'Total Loan Amount'
+FROM dbo.tblAccountDim
+WHERE YEAR(open_date) >= 2016 and YEAR(open_date) <= 2019
+GROUP BY YEAR(open_date)
+GO
+/****** Object:  View [dbo].[v_AccountDim]    Script Date: 12/9/2020 6:30:28 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE VIEW [dbo].[v_AccountDim] AS
+SELECT YEAR(open_date) as 'Open Date Year'
+, count(acct_id) as 'Count of Accounts'
+FROM dbo.tblAccountDim
+WHERE YEAR(open_date) >= 2016 and YEAR(open_date) <= 2019
+GROUP BY YEAR(open_date)
+GO
+/****** Object:  Table [dbo].[tblAccountFact]    Script Date: 12/9/2020 6:30:28 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblAccountFact](
+	[acct_id3] [int] NOT NULL,
 	[acct_id] [int] NOT NULL,
 	[cur_bal] [decimal](20, 4) NOT NULL,
 	[as_of_date] [date] NOT NULL,
- CONSTRAINT [PK_tlb_Account_Fact_Dim] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_tblAccountFact] PRIMARY KEY CLUSTERED 
 (
-	[acct_id] ASC
+	[acct_id3] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[tlb_Address_Dim]    Script Date: 11/30/2020 3:36:23 PM ******/
+/****** Object:  View [dbo].[v_AccountCurBal]    Script Date: 12/9/2020 6:30:28 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE TABLE [dbo].[tlb_Address_Dim](
-	[cust_add_id] [int] NOT NULL,
-	[cust_add_lat] [decimal](16, 12) NOT NULL,
-	[cust_add_lon] [decimal](16, 12) NOT NULL,
-	[cust_add_type] [varchar](1) NOT NULL,
- CONSTRAINT [PK_tlb_Address_Dim] PRIMARY KEY CLUSTERED 
-(
-	[cust_add_id] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+CREATE VIEW [dbo].[v_AccountCurBal] AS
+SELECT YEAR(as_of_date) as 'As of'
+, SUM(cur_bal) as 'Balance'
+FROM dbo.tblAccountFact
+WHERE YEAR(as_of_date) >= 2016 and YEAR(as_of_date) <= 2019
+GROUP BY YEAR(as_of_date)
 GO
-/****** Object:  Table [dbo].[tlb_Area_Dim]    Script Date: 11/30/2020 3:36:23 PM ******/
+/****** Object:  View [dbo].[v_OpenCloseCode]    Script Date: 12/9/2020 6:30:28 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE TABLE [dbo].[tlb_Area_Dim](
-	[acct_area_id] [int] NOT NULL,
-	[acc_area_name] [varchar](50) NULL,
- CONSTRAINT [PK_tlb_Area_Dim] PRIMARY KEY CLUSTERED 
-(
-	[acct_area_id] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+CREATE VIEW  [dbo].[v_OpenCloseCode] AS
+SELECT count(branch_id) as 'Accounts'
+, branch_id as 'Branch'
+, open_close_code as 'Open/Closed'
+from dbo.tblAccountDim
+Group By open_close_code, branch_id
 GO
-/****** Object:  Table [dbo].[tlb_Branch_Locations_Dim]    Script Date: 11/30/2020 3:36:23 PM ******/
+/****** Object:  Table [dbo].[tblBranchLocationsDim]    Script Date: 12/9/2020 6:30:28 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE TABLE [dbo].[tlb_Branch_Locations_Dim](
+CREATE TABLE [dbo].[tblBranchLocationsDim](
 	[branch_id] [smallint] NOT NULL,
 	[acct_branch_add_id] [int] NOT NULL,
 	[acct_area_id] [int] NOT NULL,
 	[acct_region_id] [int] NOT NULL,
 	[acct_branch_code] [varchar](5) NOT NULL,
 	[acct_branch_desc] [varchar](100) NOT NULL,
- CONSTRAINT [PK_tlb_Branch_Locations_Dim] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_tblBranchLocationsDim] PRIMARY KEY CLUSTERED 
 (
 	[branch_id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[tlb_Customer_Account_Dim]    Script Date: 11/30/2020 3:36:23 PM ******/
+/****** Object:  Table [dbo].[tblCustomerDim]    Script Date: 12/9/2020 6:30:28 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE TABLE [dbo].[tlb_Customer_Account_Dim](
-	[acct_id2] [int] NOT NULL,
-	[acct_id] [int] NOT NULL,
-	[cust_id] [smallint] NOT NULL,
- CONSTRAINT [PK_tlb_Customer_Account_Dim] PRIMARY KEY CLUSTERED 
-(
-	[acct_id2] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-/****** Object:  Table [dbo].[tlb_Customer_Dim]    Script Date: 11/30/2020 3:36:23 PM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[tlb_Customer_Dim](
+CREATE TABLE [dbo].[tblCustomerDim](
 	[cust_id] [smallint] NOT NULL,
 	[first_name] [varchar](100) NOT NULL,
 	[last_name] [varchar](100) NOT NULL,
@@ -131,96 +135,177 @@ CREATE TABLE [dbo].[tlb_Customer_Dim](
 	[cust_since_date] [date] NOT NULL,
 	[pri_branch_id] [smallint] NOT NULL,
 	[gender] [varchar](1) NOT NULL,
- CONSTRAINT [PK_tlb_Customer_Dim] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_tblCustomerDim] PRIMARY KEY CLUSTERED 
 (
 	[cust_id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[tlb_Customer_Role_Dim]    Script Date: 11/30/2020 3:36:23 PM ******/
+/****** Object:  View [dbo].[v_CustomerperRegion]    Script Date: 12/9/2020 6:30:28 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE TABLE [dbo].[tlb_Customer_Role_Dim](
-	[acct_cust_role_id] [smallint] NOT NULL,
-	[acc_cust_role_name] [varchar](50) NULL,
- CONSTRAINT [PK_tlb_Customer_Role_Dim] PRIMARY KEY CLUSTERED 
+CREATE VIEW  [dbo].[v_CustomerperRegion] AS
+SELECT b.acct_region_id as 'Region Code'
+, COUNT(c.cust_id) as 'Customer per Region'
+FROM dbo.tblCustomerDim as c
+INNER JOIN dbo.tblBranchLocationsDim as b ON b.branch_id = c.pri_branch_id
+GROUP BY b.acct_region_id;
+GO
+/****** Object:  View [dbo].[v_CustomerperArea]    Script Date: 12/9/2020 6:30:28 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE VIEW  [dbo].[v_CustomerperArea] AS
+SELECT b.acct_area_id as 'Area Code'
+, COUNT(c.cust_id) as 'Customer per Area'
+FROM dbo.tblCustomerDim as c
+INNER JOIN dbo.tblBranchLocationsDim as b ON b.branch_id = c.pri_branch_id
+GROUP BY b.acct_area_id;
+GO
+/****** Object:  Table [dbo].[tblAddressDim]    Script Date: 12/9/2020 6:30:28 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblAddressDim](
+	[cust_add_id] [int] NOT NULL,
+	[cust_add_lat] [decimal](16, 12) NOT NULL,
+	[cust_add_lon] [decimal](16, 12) NOT NULL,
+	[cust_add_type] [varchar](1) NOT NULL,
+ CONSTRAINT [PK_tblAddressDim] PRIMARY KEY CLUSTERED 
 (
-	[acct_cust_role_id] ASC
+	[cust_add_id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[tlb_Product_Dim]    Script Date: 11/30/2020 3:36:23 PM ******/
+/****** Object:  Table [dbo].[tblAreaDim]    Script Date: 12/9/2020 6:30:28 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE TABLE [dbo].[tlb_Product_Dim](
+CREATE TABLE [dbo].[tblAreaDim](
+	[acct_area_id] [int] NOT NULL,
+	[area_name] [nvarchar](50) NULL,
+ CONSTRAINT [PK_tblAreaDim] PRIMARY KEY CLUSTERED 
+(
+	[acct_area_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblCustomerAccountDim]    Script Date: 12/9/2020 6:30:28 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblCustomerAccountDim](
+	[acct_id2] [int] NOT NULL,
+	[acct_id] [int] NOT NULL,
+	[cust_id] [smallint] NOT NULL,
+ CONSTRAINT [PK_tblCustomerAccountDim] PRIMARY KEY CLUSTERED 
+(
+	[acct_id2] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblCustomerRoleDim]    Script Date: 12/9/2020 6:30:28 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblCustomerRoleDim](
+	[cust_id2] [smallint] NOT NULL,
+	[acct_cust_role_id] [smallint] NOT NULL,
+	[acct_id] [int] NOT NULL,
+	[cust_id] [smallint] NOT NULL,
+ CONSTRAINT [PK_tblCustomerRoleDim] PRIMARY KEY CLUSTERED 
+(
+	[cust_id2] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblProductDim]    Script Date: 12/9/2020 6:30:28 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblProductDim](
 	[prod_id] [smallint] NOT NULL,
 	[prod_name] [varchar](50) NULL,
- CONSTRAINT [PK_tlb_Product_Dim] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_tblProductDim] PRIMARY KEY CLUSTERED 
 (
 	[prod_id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[tlb_Region_Dim]    Script Date: 11/30/2020 3:36:23 PM ******/
+/****** Object:  Table [dbo].[tblRegionDim]    Script Date: 12/9/2020 6:30:28 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE TABLE [dbo].[tlb_Region_Dim](
+CREATE TABLE [dbo].[tblRegionDim](
 	[acct_region_id] [int] NOT NULL,
 	[acc_region_name] [varchar](50) NULL,
- CONSTRAINT [PK_tlb_Region_Dim] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_tblRegionDim] PRIMARY KEY CLUSTERED 
 (
 	[acct_region_id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tlb_Account_Dim]  WITH CHECK ADD  CONSTRAINT [FK_tlb_Account_Dim_tlb_Branch_Locations_Dim] FOREIGN KEY([branch_id])
-REFERENCES [dbo].[tlb_Branch_Locations_Dim] ([branch_id])
+ALTER TABLE [dbo].[tblAccountDim]  WITH CHECK ADD  CONSTRAINT [FK_tblAccountDim_tblBranchLocationsDim] FOREIGN KEY([branch_id])
+REFERENCES [dbo].[tblBranchLocationsDim] ([branch_id])
 GO
-ALTER TABLE [dbo].[tlb_Account_Dim] CHECK CONSTRAINT [FK_tlb_Account_Dim_tlb_Branch_Locations_Dim]
+ALTER TABLE [dbo].[tblAccountDim] CHECK CONSTRAINT [FK_tblAccountDim_tblBranchLocationsDim]
 GO
-ALTER TABLE [dbo].[tlb_Account_Dim]  WITH CHECK ADD  CONSTRAINT [FK_tlb_Account_Dim_tlb_Customer_Dim] FOREIGN KEY([cust_id])
-REFERENCES [dbo].[tlb_Customer_Dim] ([cust_id])
+ALTER TABLE [dbo].[tblAccountDim]  WITH CHECK ADD  CONSTRAINT [FK_tblAccountDim_tblCustomerDim] FOREIGN KEY([cust_id])
+REFERENCES [dbo].[tblCustomerDim] ([cust_id])
 GO
-ALTER TABLE [dbo].[tlb_Account_Dim] CHECK CONSTRAINT [FK_tlb_Account_Dim_tlb_Customer_Dim]
+ALTER TABLE [dbo].[tblAccountDim] CHECK CONSTRAINT [FK_tblAccountDim_tblCustomerDim]
 GO
-ALTER TABLE [dbo].[tlb_Account_Dim]  WITH CHECK ADD  CONSTRAINT [FK_tlb_Account_Dim_tlb_Product_Dim] FOREIGN KEY([prod_id])
-REFERENCES [dbo].[tlb_Product_Dim] ([prod_id])
+ALTER TABLE [dbo].[tblAccountDim]  WITH CHECK ADD  CONSTRAINT [FK_tblAccountDim_tblProductDim] FOREIGN KEY([prod_id])
+REFERENCES [dbo].[tblProductDim] ([prod_id])
 GO
-ALTER TABLE [dbo].[tlb_Account_Dim] CHECK CONSTRAINT [FK_tlb_Account_Dim_tlb_Product_Dim]
+ALTER TABLE [dbo].[tblAccountDim] CHECK CONSTRAINT [FK_tblAccountDim_tblProductDim]
 GO
-ALTER TABLE [dbo].[tlb_Branch_Locations_Dim]  WITH CHECK ADD  CONSTRAINT [FK_tlb_Branch_Locations_Dim_tlb_Area_Dim] FOREIGN KEY([acct_area_id])
-REFERENCES [dbo].[tlb_Area_Dim] ([acct_area_id])
+ALTER TABLE [dbo].[tblAccountFact]  WITH CHECK ADD  CONSTRAINT [FK_tblAccountFact_tblAccountDim] FOREIGN KEY([acct_id])
+REFERENCES [dbo].[tblAccountDim] ([acct_id])
 GO
-ALTER TABLE [dbo].[tlb_Branch_Locations_Dim] CHECK CONSTRAINT [FK_tlb_Branch_Locations_Dim_tlb_Area_Dim]
+ALTER TABLE [dbo].[tblAccountFact] CHECK CONSTRAINT [FK_tblAccountFact_tblAccountDim]
 GO
-ALTER TABLE [dbo].[tlb_Branch_Locations_Dim]  WITH CHECK ADD  CONSTRAINT [FK_tlb_Branch_Locations_Dim_tlb_Branch_Locations_Dim] FOREIGN KEY([branch_id])
-REFERENCES [dbo].[tlb_Branch_Locations_Dim] ([branch_id])
+ALTER TABLE [dbo].[tblBranchLocationsDim]  WITH CHECK ADD  CONSTRAINT [FK_tblBranchLocationsDim_tblAreaDim] FOREIGN KEY([acct_area_id])
+REFERENCES [dbo].[tblAreaDim] ([acct_area_id])
 GO
-ALTER TABLE [dbo].[tlb_Branch_Locations_Dim] CHECK CONSTRAINT [FK_tlb_Branch_Locations_Dim_tlb_Branch_Locations_Dim]
+ALTER TABLE [dbo].[tblBranchLocationsDim] CHECK CONSTRAINT [FK_tblBranchLocationsDim_tblAreaDim]
 GO
-ALTER TABLE [dbo].[tlb_Branch_Locations_Dim]  WITH CHECK ADD  CONSTRAINT [FK_tlb_Branch_Locations_Dim_tlb_Region_Dim] FOREIGN KEY([acct_region_id])
-REFERENCES [dbo].[tlb_Region_Dim] ([acct_region_id])
+ALTER TABLE [dbo].[tblBranchLocationsDim]  WITH CHECK ADD  CONSTRAINT [FK_tblBranchLocationsDim_tblRegionDim] FOREIGN KEY([acct_region_id])
+REFERENCES [dbo].[tblRegionDim] ([acct_region_id])
 GO
-ALTER TABLE [dbo].[tlb_Branch_Locations_Dim] CHECK CONSTRAINT [FK_tlb_Branch_Locations_Dim_tlb_Region_Dim]
+ALTER TABLE [dbo].[tblBranchLocationsDim] CHECK CONSTRAINT [FK_tblBranchLocationsDim_tblRegionDim]
 GO
-ALTER TABLE [dbo].[tlb_Customer_Account_Dim]  WITH CHECK ADD  CONSTRAINT [FK_tlb_Customer_Account_Dim_tlb_Account_Dim] FOREIGN KEY([acct_id])
-REFERENCES [dbo].[tlb_Account_Dim] ([acct_id])
+ALTER TABLE [dbo].[tblCustomerAccountDim]  WITH CHECK ADD  CONSTRAINT [FK_tblCustomerAccountDim_tblAccountDim] FOREIGN KEY([acct_id])
+REFERENCES [dbo].[tblAccountDim] ([acct_id])
 GO
-ALTER TABLE [dbo].[tlb_Customer_Account_Dim] CHECK CONSTRAINT [FK_tlb_Customer_Account_Dim_tlb_Account_Dim]
+ALTER TABLE [dbo].[tblCustomerAccountDim] CHECK CONSTRAINT [FK_tblCustomerAccountDim_tblAccountDim]
 GO
-ALTER TABLE [dbo].[tlb_Customer_Account_Dim]  WITH CHECK ADD  CONSTRAINT [FK_tlb_Customer_Account_Dim_tlb_Customer_Dim] FOREIGN KEY([cust_id])
-REFERENCES [dbo].[tlb_Customer_Dim] ([cust_id])
+ALTER TABLE [dbo].[tblCustomerAccountDim]  WITH CHECK ADD  CONSTRAINT [FK_tblCustomerAccountDim_tblCustomerDim] FOREIGN KEY([cust_id])
+REFERENCES [dbo].[tblCustomerDim] ([cust_id])
 GO
-ALTER TABLE [dbo].[tlb_Customer_Account_Dim] CHECK CONSTRAINT [FK_tlb_Customer_Account_Dim_tlb_Customer_Dim]
+ALTER TABLE [dbo].[tblCustomerAccountDim] CHECK CONSTRAINT [FK_tblCustomerAccountDim_tblCustomerDim]
 GO
-ALTER TABLE [dbo].[tlb_Customer_Dim]  WITH CHECK ADD  CONSTRAINT [FK_tlb_Customer_Dim_tlb_Branch_Locations_Dim] FOREIGN KEY([pri_branch_id])
-REFERENCES [dbo].[tlb_Branch_Locations_Dim] ([branch_id])
+ALTER TABLE [dbo].[tblCustomerDim]  WITH CHECK ADD  CONSTRAINT [FK_tblCustomerDim_tblBranchLocationsDim] FOREIGN KEY([pri_branch_id])
+REFERENCES [dbo].[tblBranchLocationsDim] ([branch_id])
 GO
-ALTER TABLE [dbo].[tlb_Customer_Dim] CHECK CONSTRAINT [FK_tlb_Customer_Dim_tlb_Branch_Locations_Dim]
+ALTER TABLE [dbo].[tblCustomerDim] CHECK CONSTRAINT [FK_tblCustomerDim_tblBranchLocationsDim]
+GO
+ALTER TABLE [dbo].[tblCustomerRoleDim]  WITH CHECK ADD  CONSTRAINT [FK_tblCustomerRoleDim_tblAccountDim] FOREIGN KEY([acct_id])
+REFERENCES [dbo].[tblAccountDim] ([acct_id])
+GO
+ALTER TABLE [dbo].[tblCustomerRoleDim] CHECK CONSTRAINT [FK_tblCustomerRoleDim_tblAccountDim]
+GO
+ALTER TABLE [dbo].[tblCustomerRoleDim]  WITH CHECK ADD  CONSTRAINT [FK_tblCustomerRoleDim_tblCustomerDim] FOREIGN KEY([cust_id])
+REFERENCES [dbo].[tblCustomerDim] ([cust_id])
+GO
+ALTER TABLE [dbo].[tblCustomerRoleDim] CHECK CONSTRAINT [FK_tblCustomerRoleDim_tblCustomerDim]
 GO

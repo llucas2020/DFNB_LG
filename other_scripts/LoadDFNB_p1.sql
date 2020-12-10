@@ -121,9 +121,9 @@ FROM dbo.stg_p1 sp
 --TRUNCATE TABLE dbo.tblCustomerRoleDim
 --INSERT INTO dbo.tblCustomerRoleDim
 
-SELECT DISTINCT sp.acct_cust_role_id
+SELECT DISTINCT cust_id2
+, sp.acct_cust_role_id
 , sp.acct_id
 , sp.cust_id
 --INTO dbo.tblCustomerRoleDim
 FROM dbo.stg_p1 sp
-
