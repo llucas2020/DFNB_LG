@@ -5,6 +5,7 @@ MODIFICATION LOG:
 Ver      Date        Author        Description
 -----   ----------   -----------   -------------------------------------------------------------------------------
 1.0     11/30/2020   LLUCAS2020      1. Created table dbo.tblAccountDim
+2.0     12/13/2020   LLUCAS2020      2. Added Version 2 enhancements for LDSBC IT 240 - Project 1.6: DFNB - Analyze History
 
 RUNTIME: 
 Approx. 1 min
