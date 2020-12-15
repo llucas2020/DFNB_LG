@@ -5,6 +5,7 @@ MODIFICATION LOG:
 Ver      Date        Author        Description
 -----   ----------   -----------   -------------------------------------------------------------------------------
 1.0     11/30/2020   LLUCAS2020      1. Created all the tables necessary for the 'Analyze History' assigment for IT240
+2.0     12/14/2020   LLUCAS2020      2. Added enhancements for LDSBC IT 240 - Project 2.4: DFNB - Evaluate Current Performance - Create v1 of Script Repository
 
 RUNTIME: 
 Approx. 1 min
@@ -17,6 +18,7 @@ of the code the rights of the Free Software Definition. All derivative work can 
 distributed under the same license terms.
  
 ******************************************************************************************************************/
+
 -- create dbo.tblCustomerDim
 --TRUNCATE TABLE dbo.tblCustomerDim;
 --INSERT INTO dbo.tblCustomerDim
@@ -127,3 +129,29 @@ SELECT DISTINCT cust_id2
 , sp.cust_id
 --INTO dbo.tblCustomerRoleDim
 FROM dbo.stg_p1 sp
+
+--create dbo.tblTransactionFact
+--TRUNCATE TABLE dbo.tblTransactionFact
+--INSERT INTO dbo.tblTransactionFact
+
+SELECT DISTINCT tran_date
+, tran_time
+, tran_type_id
+, tran_amt
+, tran_fee_amt
+, branch_id
+, acct_id
+--INTO dbo.tblTransactionFact
+FROM dbo.stg_p2
+
+--create dbo.tblTransactionTypeDim
+--TRUNCATE TABLE dbo.tblTransactionTypeDim
+--INSERT INTO dbo.tblTransactionTypeDim
+
+SELECT DISTINCT tran_type_id
+, tran_type_code
+, tran_type_desc
+, tran_fee_prct
+, cur_cust_req_ind
+--INTO dbo.tblTransactionTypeDim
+FROM dbo.stg_p2
