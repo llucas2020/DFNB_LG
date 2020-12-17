@@ -5,6 +5,7 @@ MODIFICATION LOG:
 Ver      Date        Author        Description
 -----   ----------   -----------   -------------------------------------------------------------------------------
 1.0     12/16/2020   LLUCAS2020      1. Created view dbo.v_TransactionCustomer
+2.0     12/17/2020   LLUCAS2020      2. Added Version 2 enhancements for LDSBC IT 240 - Project 2.6: DFNB - Evaluate Current Performance
 
 RUNTIME: 
 Approx. 1 min
@@ -21,11 +22,11 @@ distributed under the same license terms.
 USE [DFNB2]
 GO
 
-/****** Object:  View [dbo].[v_TransactionCustomer]    Script Date: 12/16/2020 2:46:54 PM ******/
+/****** Object:  View [dbo].[v_TransactionCustomer]    Script Date: 12/17/2020 3:52:52 PM ******/
 DROP VIEW [dbo].[v_TransactionCustomer]
 GO
 
-/****** Object:  View [dbo].[v_TransactionCustomer]    Script Date: 12/16/2020 2:46:54 PM ******/
+/****** Object:  View [dbo].[v_TransactionCustomer]    Script Date: 12/17/2020 3:52:52 PM ******/
 SET ANSI_NULLS ON
 GO
 

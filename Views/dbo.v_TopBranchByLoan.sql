@@ -5,6 +5,7 @@ MODIFICATION LOG:
 Ver      Date        Author        Description
 -----   ----------   -----------   -------------------------------------------------------------------------------
 1.0     11/30/2020   LLUCAS2020      1. Created view dbo.v_TopBranchByLoan
+2.0     12/17/2020   LLUCAS2020      2. Added Version 2 enhancements for LDSBC IT 240 - Project 2.6: DFNB - Evaluate Current Performance
 
 RUNTIME: 
 Approx. 1 min
@@ -21,11 +22,11 @@ distributed under the same license terms.
 USE [DFNB2]
 GO
 
-/****** Object:  View [dbo].[v_TopBranchByLoan]    Script Date: 12/12/2020 12:50:43 AM ******/
+/****** Object:  View [dbo].[v_TopBranchByLoan]    Script Date: 12/17/2020 3:46:53 PM ******/
 DROP VIEW [dbo].[v_TopBranchByLoan]
 GO
 
-/****** Object:  View [dbo].[v_TopBranchByLoan]    Script Date: 12/12/2020 12:50:43 AM ******/
+/****** Object:  View [dbo].[v_TopBranchByLoan]    Script Date: 12/17/2020 3:46:53 PM ******/
 SET ANSI_NULLS ON
 GO
 
