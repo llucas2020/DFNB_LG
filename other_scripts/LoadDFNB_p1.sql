@@ -6,6 +6,7 @@ Ver      Date        Author        Description
 -----   ----------   -----------   -------------------------------------------------------------------------------
 1.0     11/30/2020   LLUCAS2020      1. Created all the tables necessary for the 'Analyze History' assigment for IT240
 2.0     12/14/2020   LLUCAS2020      2. Added enhancements for LDSBC IT 240 - Project 2.4: DFNB - Evaluate Current Performance - Create v1 of Script Repository
+3.0     12/16/2020   LLUCAS2020      3. Added enhancements for LDSBC IT 240 - Project 3.4: DFNB - Predict and Prescribe Future Performance - Create v1 of Script Repository
 
 RUNTIME: 
 Approx. 1 min
@@ -155,3 +156,17 @@ SELECT DISTINCT tran_type_id
 , cur_cust_req_ind
 --INTO dbo.tblTransactionTypeDim
 FROM dbo.stg_p2
+
+/*CREATE TABLE dbo.tblBranchGoal (
+branch_goal_id int identity (1,1) primary key not null  
+, branch_id smallint not null
+, acct_branch_desc varchar(100) not null
+);
+
+INSERT INTO dbo.tblBranchGoal
+SELECT DISTINCT branch_id
+, acct_branch_desc
+FROM dbo.tblBranchLocationsDim*/
+
+SELECT * FROM dbo.tblBranchGoal
+
